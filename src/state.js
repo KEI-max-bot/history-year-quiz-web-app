@@ -2,6 +2,7 @@
 
 // ----- ストレージ設定 -----
 const STORAGE_KEY = "nengo-quiz-user-data";
+const MODE_STORAGE_KEY = "nengo-quiz-mode";
 
 // ----- カテゴリ表示の並び順 -----
 const CATEGORY_ORDER = [

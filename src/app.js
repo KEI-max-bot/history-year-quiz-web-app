@@ -5,8 +5,8 @@ document.addEventListener("DOMContentLoaded", () => {
     initializeData();
     bindUI();
     renderEventLists();
-    // 起動時はクイズモード
-    switchMode("quiz");
+    // 保存されたモードを復元
+    switchMode(getSavedMode());
 });
 
 // ----- data.js の読み込み -----

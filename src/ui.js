@@ -10,6 +10,33 @@ function switchMode(mode) {
     buttons.forEach((btn) => {
         btn.classList.toggle("is-active", btn.dataset.mode === mode);
     });
+    // モードをLocal Storageに保存
+    localStorage.setItem(MODE_STORAGE_KEY, mode);
+}
+
+// ----- 保存されたモードを取得 -----
+function getSavedMode() {
+    return localStorage.getItem(MODE_STORAGE_KEY) || "quiz";
+}
+
+// ----- 開いているグループを取得 -----
+function getOpenGroups() {
+    const openGroups = [];
+    document.querySelectorAll(".group.is-open").forEach((group) => {
+        const title = group.querySelector(".group-title");
+        if (title) openGroups.push(title.textContent);
+    });
+    return openGroups;
+}
+
+// ----- 開いているグループを復元 -----
+function restoreOpenGroups(openGroups) {
+    document.querySelectorAll(".group").forEach((group) => {
+        const title = group.querySelector(".group-title");
+        if (title && openGroups.includes(title.textContent)) {
+            group.classList.add("is-open");
+        }
+    });
 }
 
 // ----- 一覧の再描画 -----
@@ -18,9 +45,16 @@ function renderEventLists() {
     const centuryContainer = getById("centuryEvents");
     const categoryContainer = getById("categorizedEvents");
     if (!centuryContainer || !categoryContainer) return;
+
+    // 開いているグループを記録
+    const openGroups = getOpenGroups();
+
     renderGroupedList(allEvents, "century", centuryContainer);
     renderGroupedList(allEvents, "category", categoryContainer);
     setupGroupToggles();
+
+    // 開いていたグループを復元
+    restoreOpenGroups(openGroups);
 }
 
 // ----- グループごとのリスト描画（XSS対策適用）-----
