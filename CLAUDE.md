@@ -138,21 +138,21 @@ PR承認前に以下を確認する：
 
 ```
 年号V6/
-├── index.html          # メインHTML
-├── style.css           # スタイルシート
 ├── CLAUDE.md           # AI向け開発ルール
 ├── README.md           # プロジェクト説明
 │
-├── src/                # アプリケーションコード
-│   ├── app.js          # エントリーポイント（初期化・イベント登録）
-│   ├── state.js        # 状態管理（state, getState, setState）
-│   ├── storage.js      # Local Storage操作
-│   ├── ui.js           # UI操作・レンダリング
-│   ├── quiz.js         # クイズ機能
-│   └── utils.js        # ユーティリティ関数
-│
-├── data/               # データファイル
-│   └── sekaishi.js     # 世界史年号データ
+├── app/                # アプリケーション本体
+│   ├── index.html      # メインHTML
+│   ├── style.css       # スタイルシート
+│   ├── src/            # JavaScriptコード
+│   │   ├── app.js      # エントリーポイント
+│   │   ├── state.js    # 状態管理
+│   │   ├── storage.js  # Local Storage操作
+│   │   ├── ui.js       # UI操作・レンダリング
+│   │   ├── quiz.js     # クイズ機能
+│   │   └── utils.js    # ユーティリティ関数
+│   └── data/           # データファイル
+│       └── sekaishi.js # 世界史年号データ
 │
 ├── openspec/           # 仕様駆動開発ドキュメント
 │   ├── AGENTS.md       # OpenSpec設定
@@ -163,19 +163,16 @@ PR承認前に以下を確認する：
 │   │   ├── quiz/spec.md    # クイズ仕様
 │   │   └── storage/spec.md # ストレージ仕様
 │   └── changes/        # 変更提案（完了後はarchiveへ）
-│       └── code-cleanup/   # リファクタリング提案
 │
 ├── .claude/            # Claude Code設定
 │   ├── settings.local.json
 │   └── commands/       # カスタムコマンド
-│       ├── create-pr.md
-│       └── openspec/
 │
 └── .github/            # GitHub設定
     └── copilot-instructions.md
 ```
 
-### src/ ファイルの役割
+### app/src/ ファイルの役割
 
 | ファイル | 役割 |
 |----------|------|
