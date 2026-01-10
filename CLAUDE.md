@@ -39,3 +39,21 @@ Keep this managed block so 'openspec update' can refresh the instructions.
 - **proposal.md、design.md、tasks.md はすべてユーザーとの合意が必須**
 - 合意前に実装を開始しない
 - 各ステップでユーザーに確認を取り、承認を得てから次に進む
+
+## ブランチ命名規則
+
+| プレフィックス | 用途 | 例 |
+|----------------|------|-----|
+| `feature/` | 新機能追加 | `feature/xss-fix` |
+| `fix/` | バグ修正 | `fix/bc-input-validation` |
+| `docs/` | ドキュメント更新 | `docs/readme-update` |
+| `refactor/` | リファクタリング | `refactor/split-modules` |
+| `style/` | スタイル変更のみ | `style/dark-mode` |
+| `test/` | テスト追加・修正 | `test/quiz-unit-tests` |
+
+### 命名ルール
+
+- 小文字のみ（大文字禁止）
+- 単語区切りはハイフン（`-`）
+- 日本語禁止（英語のみ）
+- 短く明確に
