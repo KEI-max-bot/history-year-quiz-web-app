@@ -159,6 +159,7 @@ PR承認前に以下を確認する：
 ├── openspec/           # 仕様駆動開発ドキュメント
 │   ├── AGENTS.md       # OpenSpec設定
 │   ├── project.md      # プロジェクト概要
+│   ├── roadmap.md      # 開発ロードマップ
 │   ├── specs/          # 仕様書
 │   │   ├── test-spec.md
 │   │   ├── ui-spec.md      # UI/UX設計方針
