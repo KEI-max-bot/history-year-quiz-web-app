@@ -138,8 +138,10 @@ PR承認前に以下を確認する：
 
 ```
 年号V6/
+├── index.html          # リダイレクト用（→ app/index.html）
 ├── CLAUDE.md           # AI向け開発ルール
 ├── README.md           # プロジェクト説明
+├── AGENTS.md           # OpenSpecエイリアス
 │
 ├── app/                # アプリケーション本体
 │   ├── index.html      # メインHTML
@@ -158,15 +160,18 @@ PR承認前に以下を確認する：
 │   ├── AGENTS.md       # OpenSpec設定
 │   ├── project.md      # プロジェクト概要
 │   ├── specs/          # 仕様書
-│   │   ├── test-spec.md    # テスト仕様
-│   │   ├── data/spec.md    # データ仕様
-│   │   ├── quiz/spec.md    # クイズ仕様
-│   │   └── storage/spec.md # ストレージ仕様
-│   └── changes/        # 変更提案（完了後はarchiveへ）
+│   │   ├── test-spec.md
+│   │   ├── data/spec.md
+│   │   ├── quiz/spec.md
+│   │   └── storage/spec.md
+│   ├── changes/        # 進行中の変更提案
+│   └── archive/        # 完了した変更提案
 │
 ├── .claude/            # Claude Code設定
 │   ├── settings.local.json
 │   └── commands/       # カスタムコマンド
+│       ├── create-pr.md
+│       └── openspec/   # OpenSpecコマンド
 │
 └── .github/            # GitHub設定
     └── copilot-instructions.md
