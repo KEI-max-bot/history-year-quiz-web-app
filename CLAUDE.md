@@ -131,3 +131,29 @@ PR承認前に以下を確認する：
 ### テスト
 - [ ] 動作確認を行ったか
 - [ ] 複数ブラウザで確認したか（必要な場合）
+
+---
+
+## 🚧 現在進行中のタスク
+
+### ブランチ: `refactor/code-cleanup`
+
+**状態**: 実装中（proposal/design/tasks承認済み）
+
+**目的**: main.jsのリファクタリング（480行を機能別に分割、XSS対策）
+
+**承認済みドキュメント**:
+- `openspec/changes/code-cleanup/proposal.md` ✅
+- `openspec/changes/code-cleanup/design.md` ✅
+- `openspec/changes/code-cleanup/tasks.md` ✅
+
+**次のAIへの引き継ぎ**:
+1. `tasks.md` を読んで残りのタスクを確認
+2. `design.md` を読んでファイル構成と実装方針を理解
+3. 準備タスク（バックアップ、フォルダ作成）は完了済み
+4. `src/utils.js` から順にファイルを作成していく
+
+**完了した準備**:
+- [x] main.js.bak としてバックアップ
+- [x] src/ フォルダを作成
+- [x] data/ フォルダを作成
