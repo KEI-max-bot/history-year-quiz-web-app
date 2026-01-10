@@ -2,8 +2,11 @@
 // data.js の data.sekaishi をベースに動きます。
 // ----- 汎用 DOM ヘルパー -----
 const getById = (id) => document.getElementById(id);
+// ----- ストレージ設定 -----
+const STORAGE_KEY = "nengo-quiz-user-data";
 // ----- 状態管理 -----
 let allEvents = [];
+let userAddedEvents = []; // ユーザーが追加したデータ
 let quizEvents = [];
 let currentQuizIndex = 0;
 let correctCount = 0;
@@ -31,14 +34,50 @@ document.addEventListener("DOMContentLoaded", () => {
 // ---------- data.js の読み込み ----------
 function initializeData() {
     // data.js の global const data を利用
-    if (typeof data === "undefined" ||
-        !data ||
-        !Array.isArray(data.sekaishi)) {
+    let initialData = [];
+    if (typeof data !== "undefined" && data && Array.isArray(data.sekaishi)) {
+        initialData = data.sekaishi.map((item) => (Object.assign(Object.assign({}, item), { century: getCentury(item.year), isInitial: true })));
+    } else {
         console.warn("data.sekaishi が見つかりませんでした。");
-        allEvents = [];
-        return;
     }
-    allEvents = data.sekaishi.map((item) => (Object.assign(Object.assign({}, item), { century: getCentury(item.year) })));
+
+    // Local Storageからユーザー追加データを読み込み
+    userAddedEvents = loadUserData();
+
+    // 初期データとユーザー追加データをマージ
+    allEvents = [...initialData, ...userAddedEvents];
+}
+
+// ---------- Local Storage 操作 ----------
+function loadUserData() {
+    try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (!stored) return [];
+        const parsed = JSON.parse(stored);
+        if (!Array.isArray(parsed)) return [];
+        // centuryを再計算して返す
+        return parsed.map((item) => (Object.assign(Object.assign({}, item), { century: getCentury(item.year), isInitial: false })));
+    } catch (e) {
+        console.warn("Local Storageのデータ読み込みに失敗しました:", e);
+        return [];
+    }
+}
+
+function saveUserData() {
+    try {
+        // isInitial, century を除いて保存
+        const dataToSave = userAddedEvents.map(({ year, event, category, img, alt, note }) => {
+            const item = { year, event, category };
+            if (img) item.img = img;
+            if (alt) item.alt = alt;
+            if (note) item.note = note;
+            return item;
+        });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
+    } catch (e) {
+        console.error("Local Storageへの保存に失敗しました:", e);
+        alert("データの保存に失敗しました。ストレージ容量を確認してください。");
+    }
 }
 // ---------- UI イベント登録 ----------
 function bindUI() {
@@ -126,8 +165,11 @@ function addEvent() {
         event: eventText,
         category,
         century: getCentury(year),
+        isInitial: false,
     };
     allEvents.push(newItem);
+    userAddedEvents.push(newItem);
+    saveUserData(); // Local Storageに保存
     yearInput.value = "";
     eventInput.value = "";
     renderEventLists();
@@ -206,19 +248,31 @@ function renderGroupedList(items, key, container) {
           <span class="event-year">${formatYear(item.year)}</span>
           <span class="event-name">${item.event}</span>
         `;
-            const deleteBtn = document.createElement("button");
-            deleteBtn.type = "button";
-            deleteBtn.className = "ghost-button small";
-            deleteBtn.textContent = "削除";
-            deleteBtn.addEventListener("click", () => {
-                const idx = allEvents.indexOf(item);
-                if (idx !== -1) {
-                    allEvents.splice(idx, 1);
-                    renderEventLists();
-                }
-            });
             li.appendChild(main);
-            li.appendChild(deleteBtn);
+            // ユーザー追加データのみ削除可能
+            if (!item.isInitial) {
+                const deleteBtn = document.createElement("button");
+                deleteBtn.type = "button";
+                deleteBtn.className = "ghost-button small";
+                deleteBtn.textContent = "削除";
+                deleteBtn.addEventListener("click", () => {
+                    const ok = window.confirm(`「${item.event}」を削除しますか？`);
+                    if (!ok) return;
+                    // allEventsから削除
+                    const idx = allEvents.indexOf(item);
+                    if (idx !== -1) {
+                        allEvents.splice(idx, 1);
+                    }
+                    // userAddedEventsから削除
+                    const userIdx = userAddedEvents.indexOf(item);
+                    if (userIdx !== -1) {
+                        userAddedEvents.splice(userIdx, 1);
+                    }
+                    saveUserData(); // Local Storageに保存
+                    renderEventLists();
+                });
+                li.appendChild(deleteBtn);
+            }
             list.appendChild(li);
         });
         content.appendChild(list);
