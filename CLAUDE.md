@@ -161,6 +161,7 @@ PR承認前に以下を確認する：
 │   ├── project.md      # プロジェクト概要
 │   ├── specs/          # 仕様書
 │   │   ├── test-spec.md
+│   │   ├── ui-spec.md      # UI/UX設計方針
 │   │   ├── data/spec.md
 │   │   ├── quiz/spec.md
 │   │   └── storage/spec.md
