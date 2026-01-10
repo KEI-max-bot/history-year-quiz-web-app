@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>年号道場｜世界史年号トレーニング</title>
+  <meta name="description" content="自分だけの世界史年号クイズを作成できる学習アプリ。高校生向けに、世界史の年号を効率よく覚えられるよう設計しました。" />
+  <meta name="keywords" content="年号,クイズ,日本史,世界史,学習,無料,作成,年号クイズ,歴史学習" />
+  <meta name="author" content="Kei" />
+  <meta property="og:title" content="年号道場｜世界史年号トレーニング" />
+  <meta property="og:description" content="自分だけの年号クイズを作成して、世界史を効率的に学ぼう。" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="app-shell">
+    <!-- ヘッダー -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-mark">世</div>
+        <div class="brand-text">
+          <h1 class="brand-title">年号道場</h1>
+          <p class="brand-subtitle">世界史年号トレーニング</p>
+        </div>
+      </div>
+      <p class="header-description">
+        自分だけの年号クイズを作成して、世界史の年号をスマホからサクッと復習。高校生向けのシンプルな学習ツールです。
+      </p>
+    </header>
+
+    <!-- モード切り替え -->
+    <nav class="mode-nav">
+      <button class="mode-button is-active" data-mode="input">
+        入力モード
+      </button>
+      <button class="mode-button" data-mode="quiz">
+        クイズモード
+      </button>
+    </nav>
+
+    <main class="main">
+      <!-- 入力モード -->
+      <section id="input-mode" class="mode-panel is-active" aria-label="入力モード">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">年号データを追加</h2>
+            <p class="card-subtitle">
+              覚えたい出来事と年号を登録して、自分専用の問題集を作成します。
+            </p>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="year" class="field-label">年号</label>
+              <input type="number" id="year" class="field-input" placeholder="例: 1789" />
+            </div>
+
+            <div class="form-field">
+              <label for="event" class="field-label">出来事</label>
+              <input type="text" id="event" class="field-input" placeholder="例: フランス革命" />
+            </div>
+
+            <div class="form-field form-field-full">
+              <label for="category" class="field-label">カテゴリ</label>
+              <select id="category" class="field-input">
+                <option value="古代オリエント・地中海世界">古代オリエント・地中海世界（～476年）</option>
+                <option value="東・南アジア1">東・南アジア1（～999年）</option>
+                <option value="東・南アジア2">東・南アジア2（1000年～1799年）</option>
+                <option value="イスラーム世界">イスラーム世界（～1799年）</option>
+                <option value="中世ヨーロッパ">中世ヨーロッパ（477年～1476年）</option>
+                <option value="近代ヨーロッパ">近代ヨーロッパ（大航海時代～ナポレオン戦争）</option>
+                <option value="現代世界史1">現代世界史1（1800年～1899年）</option>
+                <option value="現代世界史2">現代世界史2（1900年～1945年）</option>
+                <option value="現代世界史3">現代世界史3（1946年～）</option>
+                <option value="その他">その他</option>
+              </select>
+            </div>
+
+            <div class="form-actions">
+              <button id="add-event-btn" class="primary-button">
+                + 年号を追加
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 登録済み一覧（タブ切り替え） -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">登録済み年号一覧</h2>
+            <p class="card-subtitle">
+              世紀別・カテゴリ別のタブを切り替えて、登録した年号を確認できます。
+            </p>
+          </div>
+
+          <div class="tabs" role="tablist">
+            <button class="tab-button is-active" data-tab="by-century" type="button">
+              世紀別
+            </button>
+            <button class="tab-button" data-tab="by-category" type="button">
+              カテゴリ別
+            </button>
+          </div>
+
+          <div class="tab-panels">
+            <div id="tab-by-century" class="tab-panel is-active" role="tabpanel">
+              <div id="centuryEvents"></div>
+            </div>
+            <div id="tab-by-category" class="tab-panel" role="tabpanel">
+              <div id="categorizedEvents"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- クイズモード -->
+      <section id="quiz-mode" class="mode-panel" aria-label="クイズモード">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">クイズモード（出来事 → 年号）</h2>
+            <p class="card-subtitle">
+              カテゴリを選んで、出来事から年号を当てるクイズに挑戦しましょう。
+            </p>
+          </div>
+
+          <div class="form-grid quiz-settings">
+            <div class="form-field form-field-full">
+              <label for="category-select" class="field-label">クイズに出すカテゴリ</label>
+              <select id="category-select" class="field-input">
+                <option value="全て">全て</option>
+                <option value="古代オリエント・地中海世界">古代オリエント・地中海世界（～476年）</option>
+                <option value="東・南アジア1">東・南アジア1（～999年）</option>
+                <option value="東・南アジア2">東・南アジア2（1000年～1799年）</option>
+                <option value="イスラーム世界">イスラーム世界（～1799年）</option>
+                <option value="中世ヨーロッパ">中世ヨーロッパ（477年～1476年）</option>
+                <option value="近代ヨーロッパ">近代ヨーロッパ（大航海時代～ナポレオン戦争）</option>
+                <option value="現代世界史1">現代世界史1（1800年～1899年）</option>
+                <option value="現代世界史2">現代世界史2（1900年～1945年）</option>
+                <option value="現代世界史3">現代世界史3（1946年～）</option>
+                <option value="その他">その他</option>
+              </select>
+            </div>
+
+            <div class="form-actions">
+              <button id="start-quiz-btn" class="primary-button">
+                ▶ クイズを始める
+              </button>
+            </div>
+          </div>
+
+          <div id="quiz-area" class="quiz-area">
+            <div class="quiz-meta">
+              <span id="quiz-category-label" class="quiz-category-label">カテゴリ未選択</span>
+              <span id="quiz-progress" class="quiz-progress">第0問 / 全0問</span>
+            </div>
+
+            <div class="quiz-question-block">
+              <p class="quiz-label">問題</p>
+              <p id="quiz-question" class="quiz-question-text">クイズを開始すると、ここに問題が表示されます。</p>
+              <p id="quiz-note" class="quiz-note"></p>
+            </div>
+
+            <div class="quiz-answer-row">
+              <input
+                type="number"
+                id="quiz-answer"
+                class="field-input"
+                placeholder="年号を入力（例: 1789）"
+              />
+              <button id="check-answer-btn" class="primary-button subtle">
+                答える
+              </button>
+              <button id="end-quiz-btn" class="ghost-button">
+                終了
+              </button>
+            </div>
+
+            <div class="quiz-feedback">
+              <p id="quiz-result" class="quiz-result"></p>
+              <p id="quiz-score" class="quiz-score"></p>
+              <button id="restart-quiz-btn" class="ghost-button small">
+                もう一度クイズ
+              </button>
+            </div>
+
+            <div class="quiz-bottom-row">
+              <div id="quiz-image-container" class="quiz-image-container">
+                <h4 class="quiz-history-title quiz-image-title">画像</h4> 
+                <img id="quiz-image" src="" alt="" />
+                <p id="quiz-alt" class="quiz-alt"></p>
+              </div>
+
+              <div class="quiz-history" id="quiz-history">
+                <h4 class="quiz-history-title">解答履歴</h4>
+                <ul class="quiz-history-list" id="quiz-history-list"></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <p>© Kei.T – 年号道場</p>
+    </footer>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
