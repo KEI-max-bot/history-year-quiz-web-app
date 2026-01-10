@@ -57,3 +57,33 @@ Keep this managed block so 'openspec update' can refresh the instructions.
 - 単語区切りはハイフン（`-`）
 - 日本語禁止（英語のみ）
 - 短く明確に
+
+## Pull Request フォーマット
+
+PRを作成する際は以下のフォーマットに従う：
+
+```markdown
+## Summary
+[変更内容を1-3行で簡潔に説明]
+
+## Changes
+- [変更点1]
+- [変更点2]
+- [変更点3]
+
+## Related Spec
+- openspec/changes/[機能名]/proposal.md
+- openspec/changes/[機能名]/design.md
+- openspec/changes/[機能名]/tasks.md
+
+## Test Plan
+- [ ] [テスト項目1]
+- [ ] [テスト項目2]
+
+---
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+```
+
+### カスタムコマンド
+
+- `/create-pr` - 上記フォーマットでPRを作成
