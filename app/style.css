@@ -357,70 +357,133 @@ body {
   max-height: 50vh;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-}
-
-/* グループ（世紀別/カテゴリ別） */
-
-.group {
+  padding: 8px 12px 8px 4px;
+  background: linear-gradient(180deg, var(--color-surface-soft) 0%, #f3f4f6 100%);
   border-radius: 16px;
   border: 1px solid var(--color-border-subtle);
-  background: #ffffff;
-  margin-bottom: 8px;
-  overflow: hidden;
+}
+
+/* グループ（タイムライン風・Apple風） */
+
+.group {
+  position: relative;
+  background: transparent;
+  margin-bottom: 0;
+  padding-left: 28px;
+}
+
+/* タイムラインの縦線 */
+.group::before {
+  content: "";
+  position: absolute;
+  left: 8px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, var(--color-border-subtle) 0%, #d1d5db 100%);
+  border-radius: 1px;
+}
+
+/* 最初のグループは上部を丸く */
+.group:first-child::before {
+  top: 20px;
+  border-radius: 1px 1px 0 0;
+}
+
+/* 最後のグループは下部を丸く */
+.group:last-child::before {
+  bottom: 20px;
+  border-radius: 0 0 1px 1px;
 }
 
 .group-header {
   width: 100%;
   border: none;
   background: transparent;
-  padding: 8px 10px;
+  padding: 12px 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
   cursor: pointer;
   color: var(--color-text-main);
+  position: relative;
+}
+
+/* タイムラインのドット */
+.group-header::before {
+  content: "";
+  position: absolute;
+  left: -24px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid var(--color-accent);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+  transition: all 0.2s ease;
+}
+
+.group.is-open .group-header::before {
+  background: var(--color-accent);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
 }
 
 .group-header-main {
   display: flex;
-  align-items: baseline;
-  gap: 8px;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
 }
 
 .group-title {
-  font-size: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .group-count {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--color-text-muted);
-  padding: 2px 8px;
+  padding: 3px 10px;
   border-radius: 999px;
-  background: #f3f4f6;
+  background: var(--color-surface-soft);
+  border: 1px solid var(--color-border-subtle);
+  flex-shrink: 0;
 }
 
 .group-chevron {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--color-text-muted);
   transform: rotate(180deg);
-  transition: transform 0.16s ease;
+  transition: transform 0.2s ease;
+  padding: 4px;
 }
 
 .group-content {
   max-height: 0;
   opacity: 0;
   overflow: hidden;
-  padding: 0 10px;
+  padding: 0;
+  margin-left: 4px;
+  border-left: 1px solid transparent;
   transition:
-    max-height 0.2s ease,
+    max-height 0.25s ease,
     opacity 0.2s ease,
-    padding 0.2s ease;
+    padding 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .group.is-open .group-content {
-  max-height: none;        /* 親コンテナでスクロール制御するため解除 */
+  max-height: none;
   opacity: 1;
-  padding-bottom: 8px;
+  padding: 0 0 16px 12px;
+  border-left-color: var(--color-border-subtle);
 }
 
 .group.is-open .group-chevron {
@@ -433,34 +496,51 @@ body {
   list-style: none;
   padding: 0;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .event-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  padding: 6px 0;
-  border-top: 1px solid #e5e7eb;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--color-surface);
+  border-radius: 12px;
+  border: 1px solid var(--color-border-subtle);
+  transition: all 0.15s ease;
 }
 
-.event-item:first-child {
-  border-top: none;
+.event-item:hover {
+  background: var(--color-surface-soft);
+  border-color: #d1d5db;
 }
 
 .event-main {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: baseline;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
 }
 
 .event-year {
-  font-size: 12px;
+  font-size: 14px;
+  font-weight: 600;
   color: var(--color-accent);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+  min-width: 60px;
 }
 
 .event-name {
-  font-size: 13px;
+  font-size: 14px;
+  color: var(--color-text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* クイズ */
