@@ -58,6 +58,33 @@ Keep this managed block so 'openspec update' can refresh the instructions.
 - 日本語禁止（英語のみ）
 - 短く明確に
 
+## PR作成前の整合性チェック（必須）
+
+**PRを作成する前に、必ず以下のチェックを実行すること：**
+
+### 1. タイトル・メタ情報の整合性
+- [ ] `index.html` と `app/index.html` のタイトルが統一されているか
+- [ ] OGPタグ（og:title, og:description）が正しいか
+
+### 2. OpenSpec整理
+- [ ] 完了した変更提案が `openspec/archive/` に移動されているか
+- [ ] `openspec/changes/` に不要なファイルが残っていないか
+
+### 3. 不要ファイルの確認
+- [ ] 一時ファイル（*.bak, *.tmp, *~）が残っていないか
+- [ ] console.log のデバッグ出力が残っていないか
+
+### 4. コードの整合性
+- [ ] 未使用のCSS/JSが残っていないか
+- [ ] HTML内のコメントアウトされた不要コードが残っていないか
+
+### チェック実行方法
+
+AIに `/create-pr` を依頼すると、PR作成前に上記チェックが自動実行される。
+問題があれば修正してからPRを作成する。
+
+---
+
 ## Pull Request フォーマット
 
 PRを作成する際は以下のフォーマットに従う：
