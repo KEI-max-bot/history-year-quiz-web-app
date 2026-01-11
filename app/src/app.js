@@ -6,7 +6,12 @@ document.addEventListener("DOMContentLoaded", () => {
     bindUI();
     renderEventLists();
     // 保存されたモードを復元
-    switchMode(getSavedMode());
+    const savedMode = getSavedMode();
+    switchMode(savedMode);
+    // クイズモードならカテゴリ選択画面を表示
+    if (savedMode === "quiz") {
+        showQuizSelect();
+    }
 });
 
 // ----- data.js の読み込み -----
@@ -39,7 +44,18 @@ function bindUI() {
     const quizModeBtn = document.querySelector('[data-mode="quiz"]');
     if (inputModeBtn && quizModeBtn) {
         inputModeBtn.addEventListener("click", () => switchMode("input"));
-        quizModeBtn.addEventListener("click", () => switchMode("quiz"));
+        quizModeBtn.addEventListener("click", () => {
+            switchMode("quiz");
+            showQuizSelect(); // クイズ選択画面を表示
+        });
+    }
+
+    // 「選択に戻る」ボタン
+    const backToSelectBtn = getById("back-to-select-btn");
+    if (backToSelectBtn) {
+        backToSelectBtn.addEventListener("click", () => {
+            showQuizSelect();
+        });
     }
 
     // 年号追加

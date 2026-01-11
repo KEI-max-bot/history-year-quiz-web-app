@@ -30,17 +30,16 @@
       <p class="header-description">
         世界史の年号をサクッと復習。一問一答形式で効率的に学べる高校生向けアプリです。
       </p>
+      <!-- モード切り替え -->
+      <nav class="mode-nav">
+        <button class="mode-button is-active" data-mode="input">
+          入力モード
+        </button>
+        <button class="mode-button" data-mode="quiz">
+          クイズモード
+        </button>
+      </nav>
     </header>
-
-    <!-- モード切り替え -->
-    <nav class="mode-nav">
-      <button class="mode-button is-active" data-mode="input">
-        入力モード
-      </button>
-      <button class="mode-button" data-mode="quiz">
-        クイズモード
-      </button>
-    </nav>
 
     <main class="main">
       <!-- 入力モード -->
@@ -119,43 +118,55 @@
 
       <!-- クイズモード -->
       <section id="quiz-mode" class="mode-panel" aria-label="クイズモード">
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">クイズモード（出来事 → 年号）</h2>
-            <p class="card-subtitle">
-              カテゴリを選んで、出来事から年号を当てるクイズに挑戦しましょう。
-            </p>
-          </div>
-
-          <div class="form-grid quiz-settings">
-            <div class="form-field form-field-full">
-              <label for="category-select" class="field-label">クイズに出すカテゴリ</label>
-              <select id="category-select" class="field-input">
-                <option value="全て">全て</option>
-                <option value="古代オリエント・地中海世界">古代オリエント・地中海世界（～476年）</option>
-                <option value="東・南アジア1">東・南アジア1（～999年）</option>
-                <option value="東・南アジア2">東・南アジア2（1000年～1799年）</option>
-                <option value="イスラーム世界">イスラーム世界（～1799年）</option>
-                <option value="中世ヨーロッパ">中世ヨーロッパ（477年～1476年）</option>
-                <option value="近代ヨーロッパ">近代ヨーロッパ（大航海時代～ナポレオン戦争）</option>
-                <option value="現代世界史1">現代世界史1（1800年～1899年）</option>
-                <option value="現代世界史2">現代世界史2（1900年～1945年）</option>
-                <option value="現代世界史3">現代世界史3（1946年～）</option>
-                <option value="その他">その他</option>
-              </select>
+        <!-- クイズ選択画面 -->
+        <div id="quiz-select" class="quiz-select">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">クイズを選ぶ</h2>
+              <p class="card-subtitle">
+                カテゴリを選んで、出来事から年号を当てるクイズに挑戦しましょう。
+              </p>
             </div>
 
-            <div class="form-actions">
-              <button id="start-quiz-btn" class="primary-button">
-                ▶ クイズを始める
+            <div id="category-grid" class="category-grid">
+              <!-- カテゴリカードがJSで挿入される -->
+            </div>
+          </div>
+        </div>
+
+        <!-- クイズ解答画面 -->
+        <div id="quiz-play" class="quiz-play" style="display: none;">
+          <div class="card">
+            <div class="card-header quiz-play-header">
+              <button id="back-to-select-btn" class="ghost-button small">
+                ← 選択に戻る
               </button>
+              <h2 class="card-title" id="quiz-play-title">クイズモード</h2>
             </div>
-          </div>
 
-          <div id="quiz-area" class="quiz-area">
-            <div class="quiz-meta">
-              <span id="quiz-category-label" class="quiz-category-label">カテゴリ未選択</span>
-              <span id="quiz-progress" class="quiz-progress">第0問 / 全0問</span>
+            <!-- 旧: カテゴリ選択（非表示、互換性維持） -->
+            <select id="category-select" class="field-input" style="display: none;">
+              <option value="全て">全て</option>
+              <option value="古代オリエント・地中海世界">古代オリエント・地中海世界（～476年）</option>
+              <option value="東・南アジア1">東・南アジア1（～999年）</option>
+              <option value="東・南アジア2">東・南アジア2（1000年～1799年）</option>
+              <option value="イスラーム世界">イスラーム世界（～1799年）</option>
+              <option value="中世ヨーロッパ">中世ヨーロッパ（477年～1476年）</option>
+              <option value="近代ヨーロッパ">近代ヨーロッパ（大航海時代～ナポレオン戦争）</option>
+              <option value="現代世界史1">現代世界史1（1800年～1899年）</option>
+              <option value="現代世界史2">現代世界史2（1900年～1945年）</option>
+              <option value="現代世界史3">現代世界史3（1946年～）</option>
+              <option value="その他">その他</option>
+            </select>
+
+            <div id="quiz-area" class="quiz-area">
+            <!-- プログレスバー -->
+            <div id="progress-bar-container" class="progress-container" style="display: none;">
+              <div id="progress-bar" class="progress-bar"></div>
+              <div class="progress-info">
+                <span id="progress-count" class="progress-count">0/0問</span>
+                <span id="progress-accuracy" class="progress-accuracy">正答率 --%</span>
+              </div>
             </div>
 
             <div class="quiz-question-block">
@@ -199,6 +210,7 @@
                 <ul class="quiz-history-list" id="quiz-history-list"></ul>
               </div>
             </div>
+          </div>
           </div>
         </div>
       </section>

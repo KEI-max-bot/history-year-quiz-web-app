@@ -24,7 +24,8 @@ let state = {
     userAddedEvents: [],
     quizEvents: [],
     currentQuizIndex: 0,
-    correctCount: 0
+    correctCount: 0,
+    quizResults: [] // 各問題の結果を保持: 'correct' | 'wrong' | null
 };
 
 // 状態取得
