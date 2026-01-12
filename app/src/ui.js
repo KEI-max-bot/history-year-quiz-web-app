@@ -16,7 +16,7 @@ function switchMode(mode) {
 
 // ----- 保存されたモードを取得 -----
 function getSavedMode() {
-    return localStorage.getItem(MODE_STORAGE_KEY) || "quiz";
+    return localStorage.getItem(MODE_STORAGE_KEY) || "input";
 }
 
 // ----- 開いているグループを取得 -----
