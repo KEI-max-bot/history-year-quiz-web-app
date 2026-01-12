@@ -167,6 +167,7 @@ body {
   max-width: 900px;
   margin: 0 auto;
   width: 100%;
+  overflow-x: hidden;
 }
 
 .mode-panel {
@@ -369,10 +370,7 @@ body {
   max-height: 50vh;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 16px;
-  background: var(--color-surface);
-  border-radius: 18px;
-  border: 1px solid var(--color-border-subtle);
+  padding: 16px 0;
 }
 
 /* グループ（タイムライン風・Apple風） */
@@ -1046,10 +1044,12 @@ body {
 
 .quiz-ready {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   min-height: 60vh;
   animation: fadeIn 0.3s ease;
+  padding-top: 20px;
 }
 
 .quiz-ready-content {
@@ -1059,9 +1059,8 @@ body {
 }
 
 .ready-back-btn {
-  position: absolute;
-  top: 20px;
-  left: 20px;
+  align-self: flex-start;
+  margin-bottom: 20px;
 }
 
 .ready-category-icon {
@@ -1315,13 +1314,11 @@ body {
   margin: 0;
 }
 
-/* 全カテゴリカード（特別スタイル） */
+/* 全カテゴリカード */
 .category-card.category-card-all {
   grid-column: 1 / -1;
   display: flex;
   align-items: center;
-  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-  border-color: #93c5fd;
 }
 
 .category-card-all .category-card-image {
