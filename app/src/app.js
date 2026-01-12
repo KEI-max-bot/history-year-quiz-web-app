@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initializeData();
     bindUI();
     renderEventLists();
+    setupColumnResize(); // カラムリサイズ機能を初期化
     // 保存されたモードを復元
     const savedMode = getSavedMode();
     switchMode(savedMode);

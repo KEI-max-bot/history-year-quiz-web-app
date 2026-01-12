@@ -105,7 +105,8 @@ function renderGroupedList(items, key, container) {
 
         const titleSpan = document.createElement("span");
         titleSpan.className = "group-title";
-        titleSpan.textContent = groupName;
+        // カテゴリ別の場合は年代範囲付きの表示名を使用
+        titleSpan.textContent = key === "category" ? getCategoryDisplayName(groupName) : groupName;
 
         const countSpan = document.createElement("span");
         countSpan.className = "group-count";
@@ -245,6 +246,11 @@ function renderCategoryCards() {
         "その他": "gradient-other"
     };
 
+    // カテゴリと画像ファイルのマッピング
+    const imageMap = {
+        "古代オリエント・地中海世界": "images/categories/モーゼの海割り.png",
+    };
+
     // CATEGORY_ORDERに従って各カテゴリカードを作成
     CATEGORY_ORDER.forEach((category) => {
         const count = categoryCounts[category] || 0;
@@ -256,6 +262,15 @@ function renderCategoryCards() {
 
         const imageDiv = document.createElement("div");
         imageDiv.className = `category-card-image ${gradientMap[category] || "gradient-other"}`;
+
+        // 画像がある場合は追加
+        if (imageMap[category]) {
+            const img = document.createElement("img");
+            img.src = imageMap[category];
+            img.alt = category;
+            img.loading = "lazy";
+            imageDiv.appendChild(img);
+        }
 
         const infoDiv = document.createElement("div");
         infoDiv.className = "category-card-info";
@@ -363,4 +378,93 @@ function setQuizExtras(item) {
         imgEl.style.display = "none";
         altEl.textContent = "";
     }
+}
+
+// ----- カラムリサイズ機能 -----
+const RESIZE_STORAGE_KEY = "nengo-quiz-column-width";
+const MIN_COLUMN_RATIO = 0.4; // 左カラム最小比率（40%）= デフォルトが最小
+const MAX_COLUMN_RATIO = 0.5; // 左カラム最大比率（50%）= 少し広げられる
+
+function setupColumnResize() {
+    const handle = getById("resize-handle");
+    const inputMode = getById("input-mode");
+    if (!handle || !inputMode) return;
+
+    // 保存された幅を復元
+    const savedWidth = localStorage.getItem(RESIZE_STORAGE_KEY);
+    if (savedWidth) {
+        inputMode.style.setProperty("--input-col-width", savedWidth);
+    }
+
+    let isDragging = false;
+    let startX = 0;
+    let startWidth = 0;
+
+    function onMouseDown(e) {
+        isDragging = true;
+        startX = e.clientX;
+        const rect = inputMode.getBoundingClientRect();
+        const leftCard = inputMode.querySelector(".card:first-of-type");
+        if (leftCard) {
+            startWidth = leftCard.getBoundingClientRect().width;
+        }
+        handle.classList.add("is-dragging");
+        document.body.style.cursor = "col-resize";
+        document.body.style.userSelect = "none";
+        e.preventDefault();
+    }
+
+    function onMouseMove(e) {
+        if (!isDragging) return;
+        const deltaX = e.clientX - startX;
+        const containerWidth = inputMode.getBoundingClientRect().width;
+        let newWidth = startWidth + deltaX;
+
+        // 最小幅制限（デフォルト40%より縮められない）
+        const minWidth = containerWidth * MIN_COLUMN_RATIO;
+        if (newWidth < minWidth) {
+            newWidth = minWidth;
+        }
+
+        // 最大幅制限（50%まで広げられる）
+        const maxWidth = containerWidth * MAX_COLUMN_RATIO;
+        if (newWidth > maxWidth) {
+            newWidth = maxWidth;
+        }
+
+        const widthPercent = (newWidth / containerWidth) * 100;
+        inputMode.style.setProperty("--input-col-width", `${widthPercent}%`);
+    }
+
+    function onMouseUp() {
+        if (!isDragging) return;
+        isDragging = false;
+        handle.classList.remove("is-dragging");
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+
+        // 幅を保存
+        const currentWidth = inputMode.style.getPropertyValue("--input-col-width");
+        if (currentWidth) {
+            localStorage.setItem(RESIZE_STORAGE_KEY, currentWidth);
+        }
+    }
+
+    handle.addEventListener("mousedown", onMouseDown);
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+
+    // タッチ対応
+    handle.addEventListener("touchstart", (e) => {
+        const touch = e.touches[0];
+        onMouseDown({ clientX: touch.clientX, preventDefault: () => e.preventDefault() });
+    });
+
+    document.addEventListener("touchmove", (e) => {
+        if (!isDragging) return;
+        const touch = e.touches[0];
+        onMouseMove({ clientX: touch.clientX });
+    });
+
+    document.addEventListener("touchend", onMouseUp);
 }

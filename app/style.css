@@ -26,14 +26,14 @@
 }
 
 html {
-  margin: 0 !important;
-  padding: 0 !important;
+  margin: 0;
+  padding: 0;
   width: 100%;
 }
 
 body {
-  margin: 0 !important;
-  padding: 0 !important;
+  margin: 0;
+  padding: 0;
   width: 100%;
   overflow-x: hidden;
 }
@@ -836,6 +836,11 @@ body {
   color: #494d56;
 }
 
+/* リサイズハンドル（デフォルトは非表示） */
+.resize-handle {
+  display: none;
+}
+
 /* 空状態 */
 
 .empty-text {
@@ -1137,6 +1142,114 @@ body {
   /* メインを全幅に */
   .main {
     padding: 24px 32px 40px;
+    max-width: 1400px;
+  }
+
+  /* 入力モード: 2カラム・一画面完結レイアウト */
+  #input-mode.is-active {
+    display: grid;
+    grid-template-columns: var(--input-col-width, 40%) 8px 1fr;
+    gap: 0;
+    align-items: stretch;
+    height: calc(100vh - 140px);
+    overflow: hidden;
+  }
+
+  #input-mode > .card {
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* 左カラムに右マージン */
+  #input-mode > .card:first-of-type {
+    margin-right: 12px;
+  }
+
+  /* 右カラムに左マージン */
+  #input-mode > .card:last-of-type {
+    margin-left: 12px;
+  }
+
+  /* リサイズハンドル */
+  .resize-handle {
+    display: block;
+    width: 8px;
+    cursor: col-resize;
+    background: transparent;
+    position: relative;
+    transition: background 0.15s ease;
+  }
+
+  .resize-handle::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 4px;
+    height: 40px;
+    background: var(--color-border-subtle);
+    border-radius: 2px;
+    transition: background 0.15s ease, height 0.15s ease;
+  }
+
+  .resize-handle:hover::before,
+  .resize-handle.is-dragging::before {
+    background: var(--color-accent);
+    height: 60px;
+  }
+
+  .resize-handle.is-dragging {
+    background: var(--color-accent-soft);
+  }
+
+  /* 入力フォームカード */
+  #input-mode > .card:first-child .form-grid {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* 入力フォームを縦積みに（2カラムレイアウト時） */
+  #input-mode .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #input-mode .form-field-full {
+    grid-column: 1;
+  }
+
+  /* 一覧カードの高さ調整 */
+  #input-mode > .card:last-child {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  #input-mode > .card:last-child .tab-panels {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  #input-mode > .card:last-child .tab-panel.is-active {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  #input-mode > .card:last-child #centuryEvents,
+  #input-mode > .card:last-child #categorizedEvents {
+    flex: 1;
+    max-height: none;
+    min-height: 0;
+    overflow-y: auto;
   }
 
   /* クイズエリア: 1画面完結 */
@@ -1199,6 +1312,12 @@ body {
 @media (min-width: 1024px) {
   .main {
     padding: 24px 48px 40px;
+    max-width: 1600px;
+  }
+
+  /* 入力モード: gap広げる */
+  #input-mode {
+    gap: 32px;
   }
 
   .quiz-area {
@@ -1234,10 +1353,16 @@ body {
 @media (min-width: 1440px) {
   .main {
     padding: 32px 64px 48px;
+    max-width: 1800px;
   }
 
   .app-header {
     padding: 14px 64px;
+  }
+
+  /* 入力モード: gap広げる */
+  #input-mode {
+    gap: 40px;
   }
 
   .quiz-area {

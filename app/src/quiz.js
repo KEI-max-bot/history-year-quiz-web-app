@@ -111,8 +111,8 @@ function renderProgressBar() {
     // 問題数表示（終了時はtotalを超えないようにする）
     const countEl = getById("progress-count");
     if (countEl) {
-        const displayIndex = Math.min(currentQuizIndex + 1, total);
-        countEl.textContent = `${displayIndex}/${total}問`;
+        const displayQuestionNumber = Math.min(currentQuizIndex + 1, total);
+        countEl.textContent = `${displayQuestionNumber}/${total}問`;
     }
 
     // 正答率表示（常に表示してレイアウトを固定）
