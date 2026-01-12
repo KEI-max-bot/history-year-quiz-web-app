@@ -1,0 +1,26 @@
+name: Close External PRs
+
+on:
+  pull_request_target:
+    types: [opened]
+
+jobs:
+  close:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Close PR and comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.pulls.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              state: 'closed'
+            });
+            await github.rest.issues.createComment({
+              issue_number: context.payload.pull_request.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'このリポジトリは外部からのPull Requestを受け付けていません。'
+            });
