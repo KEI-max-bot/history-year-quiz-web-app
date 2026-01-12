@@ -105,7 +105,8 @@ function renderGroupedList(items, key, container) {
 
         const titleSpan = document.createElement("span");
         titleSpan.className = "group-title";
-        titleSpan.textContent = groupName;
+        // カテゴリ別の場合は年代範囲付きの表示名を使用
+        titleSpan.textContent = key === "category" ? getCategoryDisplayName(groupName) : groupName;
 
         const countSpan = document.createElement("span");
         countSpan.className = "group-count";
@@ -216,6 +217,140 @@ function addHistoryItem(item, answer, isCorrect) {
     list.prepend(li);
 }
 
+// ----- カテゴリカード描画 -----
+function renderCategoryCards() {
+    const grid = getById("category-grid");
+    if (!grid) return;
+
+    grid.innerHTML = "";
+    const { allEvents } = getState();
+
+    // カテゴリごとの問題数を集計
+    const categoryCounts = {};
+    allEvents.forEach((item) => {
+        const cat = item.category || "その他";
+        categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+    });
+
+    // カテゴリとグラデーションクラスのマッピング
+    const gradientMap = {
+        "古代オリエント・地中海世界": "gradient-ancient",
+        "東・南アジア1": "gradient-asia1",
+        "東・南アジア2": "gradient-asia2",
+        "イスラーム世界": "gradient-islam",
+        "中世ヨーロッパ": "gradient-medieval",
+        "近代ヨーロッパ": "gradient-early-modern",
+        "現代世界史1": "gradient-modern1",
+        "現代世界史2": "gradient-modern2",
+        "現代世界史3": "gradient-modern3",
+        "その他": "gradient-other"
+    };
+
+    // カテゴリと画像ファイルのマッピング
+    const imageMap = {
+        "古代オリエント・地中海世界": "images/categories/モーゼの海割り.png",
+    };
+
+    // CATEGORY_ORDERに従って各カテゴリカードを作成
+    CATEGORY_ORDER.forEach((category) => {
+        const count = categoryCounts[category] || 0;
+        if (count === 0) return; // 問題がないカテゴリはスキップ
+
+        const card = document.createElement("div");
+        card.className = "category-card";
+        card.dataset.category = category;
+
+        const imageDiv = document.createElement("div");
+        imageDiv.className = `category-card-image ${gradientMap[category] || "gradient-other"}`;
+
+        // 画像がある場合は追加
+        if (imageMap[category]) {
+            const img = document.createElement("img");
+            img.src = imageMap[category];
+            img.alt = category;
+            img.loading = "lazy";
+            imageDiv.appendChild(img);
+        }
+
+        const infoDiv = document.createElement("div");
+        infoDiv.className = "category-card-info";
+
+        const nameP = document.createElement("p");
+        nameP.className = "category-card-name";
+        nameP.textContent = category;
+
+        const countP = document.createElement("p");
+        countP.className = "category-card-count";
+        countP.textContent = `${count}問`;
+
+        infoDiv.appendChild(nameP);
+        infoDiv.appendChild(countP);
+        card.appendChild(imageDiv);
+        card.appendChild(infoDiv);
+
+        card.addEventListener("click", () => {
+            startQuizFromCategory(category);
+        });
+
+        grid.appendChild(card);
+    });
+
+    // 全カテゴリカードを追加
+    const totalCount = allEvents.length;
+    if (totalCount > 0) {
+        const allCard = document.createElement("div");
+        allCard.className = "category-card category-card-all";
+        allCard.dataset.category = "全て";
+
+        const allImageDiv = document.createElement("div");
+        allImageDiv.className = "category-card-image gradient-all";
+
+        const allInfoDiv = document.createElement("div");
+        allInfoDiv.className = "category-card-info";
+
+        const allNameP = document.createElement("p");
+        allNameP.className = "category-card-name";
+        allNameP.textContent = "全カテゴリ";
+
+        const allCountP = document.createElement("p");
+        allCountP.className = "category-card-count";
+        allCountP.textContent = `${totalCount}問`;
+
+        allInfoDiv.appendChild(allNameP);
+        allInfoDiv.appendChild(allCountP);
+        allCard.appendChild(allImageDiv);
+        allCard.appendChild(allInfoDiv);
+
+        allCard.addEventListener("click", () => {
+            startQuizFromCategory("全て");
+        });
+
+        grid.appendChild(allCard);
+    }
+}
+
+// ----- クイズ画面遷移 -----
+function showQuizSelect() {
+    const selectEl = getById("quiz-select");
+    const playEl = getById("quiz-play");
+    if (selectEl) selectEl.style.display = "block";
+    if (playEl) playEl.style.display = "none";
+    document.body.classList.remove("quiz-play-active");
+    renderCategoryCards();
+}
+
+function showQuizPlay(categoryName) {
+    const selectEl = getById("quiz-select");
+    const playEl = getById("quiz-play");
+    const titleEl = getById("quiz-play-title");
+    if (selectEl) selectEl.style.display = "none";
+    if (playEl) playEl.style.display = "block";
+    document.body.classList.add("quiz-play-active");
+    if (titleEl) {
+        titleEl.textContent = categoryName === "全て" ? "全カテゴリ" : categoryName;
+    }
+}
+
 // ----- ノート・画像表示（XSS対策適用）-----
 function setQuizExtras(item) {
     const noteEl = getById("quiz-note");
@@ -243,4 +378,93 @@ function setQuizExtras(item) {
         imgEl.style.display = "none";
         altEl.textContent = "";
     }
+}
+
+// ----- カラムリサイズ機能 -----
+const RESIZE_STORAGE_KEY = "nengo-quiz-column-width";
+const MIN_COLUMN_RATIO = 0.4; // 左カラム最小比率（40%）= デフォルトが最小
+const MAX_COLUMN_RATIO = 0.5; // 左カラム最大比率（50%）= 少し広げられる
+
+function setupColumnResize() {
+    const handle = getById("resize-handle");
+    const inputMode = getById("input-mode");
+    if (!handle || !inputMode) return;
+
+    // 保存された幅を復元
+    const savedWidth = localStorage.getItem(RESIZE_STORAGE_KEY);
+    if (savedWidth) {
+        inputMode.style.setProperty("--input-col-width", savedWidth);
+    }
+
+    let isDragging = false;
+    let startX = 0;
+    let startWidth = 0;
+
+    function onMouseDown(e) {
+        isDragging = true;
+        startX = e.clientX;
+        const rect = inputMode.getBoundingClientRect();
+        const leftCard = inputMode.querySelector(".card:first-of-type");
+        if (leftCard) {
+            startWidth = leftCard.getBoundingClientRect().width;
+        }
+        handle.classList.add("is-dragging");
+        document.body.style.cursor = "col-resize";
+        document.body.style.userSelect = "none";
+        e.preventDefault();
+    }
+
+    function onMouseMove(e) {
+        if (!isDragging) return;
+        const deltaX = e.clientX - startX;
+        const containerWidth = inputMode.getBoundingClientRect().width;
+        let newWidth = startWidth + deltaX;
+
+        // 最小幅制限（デフォルト40%より縮められない）
+        const minWidth = containerWidth * MIN_COLUMN_RATIO;
+        if (newWidth < minWidth) {
+            newWidth = minWidth;
+        }
+
+        // 最大幅制限（50%まで広げられる）
+        const maxWidth = containerWidth * MAX_COLUMN_RATIO;
+        if (newWidth > maxWidth) {
+            newWidth = maxWidth;
+        }
+
+        const widthPercent = (newWidth / containerWidth) * 100;
+        inputMode.style.setProperty("--input-col-width", `${widthPercent}%`);
+    }
+
+    function onMouseUp() {
+        if (!isDragging) return;
+        isDragging = false;
+        handle.classList.remove("is-dragging");
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+
+        // 幅を保存
+        const currentWidth = inputMode.style.getPropertyValue("--input-col-width");
+        if (currentWidth) {
+            localStorage.setItem(RESIZE_STORAGE_KEY, currentWidth);
+        }
+    }
+
+    handle.addEventListener("mousedown", onMouseDown);
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+
+    // タッチ対応
+    handle.addEventListener("touchstart", (e) => {
+        const touch = e.touches[0];
+        onMouseDown({ clientX: touch.clientX, preventDefault: () => e.preventDefault() });
+    });
+
+    document.addEventListener("touchmove", (e) => {
+        if (!isDragging) return;
+        const touch = e.touches[0];
+        onMouseMove({ clientX: touch.clientX });
+    });
+
+    document.addEventListener("touchend", onMouseUp);
 }
