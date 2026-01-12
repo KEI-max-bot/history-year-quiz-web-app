@@ -12,6 +12,11 @@ function switchMode(mode) {
     });
     // モードをLocal Storageに保存
     localStorage.setItem(MODE_STORAGE_KEY, mode);
+
+    // 入力モードのアニメーション
+    if (mode === "input") {
+        animateInputMode();
+    }
 }
 
 // ----- 保存されたモードを取得 -----
@@ -55,6 +60,7 @@ function renderEventLists() {
 
     // 開いていたグループを復元
     restoreOpenGroups(openGroups);
+
 }
 
 // ----- グループごとのリスト描画（XSS対策適用）-----
@@ -289,7 +295,7 @@ function renderCategoryCards() {
         card.appendChild(infoDiv);
 
         card.addEventListener("click", () => {
-            startQuizFromCategory(category);
+            showQuizReady(category);
         });
 
         grid.appendChild(card);
@@ -322,28 +328,138 @@ function renderCategoryCards() {
         allCard.appendChild(allInfoDiv);
 
         allCard.addEventListener("click", () => {
-            startQuizFromCategory("全て");
+            showQuizReady("全て");
         });
 
         grid.appendChild(allCard);
     }
+
+    // カードに順番にアニメーションを適用
+    animateCategoryCards();
+}
+
+// ----- カードアニメーション -----
+function animateCategoryCards() {
+    const cards = document.querySelectorAll(".category-card");
+    cards.forEach((card, index) => {
+        // 遅延を付けて順番にアニメーション
+        setTimeout(() => {
+            card.classList.add("animate-in");
+        }, 100 + index * 80); // 0.1秒後から、0.08秒間隔で
+    });
+}
+
+// ----- 入力モードアニメーション -----
+function animateInputMode() {
+    const inputMode = getById("input-mode");
+    if (!inputMode) return;
+
+    // アニメーション対象の要素と遅延時間
+    const animations = [
+        { selector: ".card:first-of-type", delay: 0 },
+        { selector: ".card:first-of-type .card-title", delay: 50 },
+        { selector: ".card:first-of-type .card-subtitle", delay: 100 },
+        { selector: ".form-grid", delay: 150 },
+        { selector: ".card:last-of-type", delay: 100 },
+        { selector: ".card:last-of-type .card-title", delay: 150 },
+        { selector: ".card:last-of-type .card-subtitle", delay: 200 },
+        { selector: ".tabs", delay: 250 },
+        { selector: "#centuryEvents", delay: 300 },
+        { selector: "#categorizedEvents", delay: 300 },
+    ];
+
+    // 既存のアニメーションクラスをリセット
+    inputMode.querySelectorAll(".animate-in").forEach(el => {
+        el.classList.remove("animate-in");
+    });
+
+    // 順番にアニメーションを適用
+    animations.forEach(({ selector, delay }) => {
+        const el = inputMode.querySelector(selector);
+        if (el) {
+            setTimeout(() => {
+                el.classList.add("animate-in");
+            }, delay);
+        }
+    });
 }
 
 // ----- クイズ画面遷移 -----
 function showQuizSelect() {
     const selectEl = getById("quiz-select");
+    const readyEl = getById("quiz-ready");
     const playEl = getById("quiz-play");
     if (selectEl) selectEl.style.display = "block";
+    if (readyEl) readyEl.style.display = "none";
     if (playEl) playEl.style.display = "none";
     document.body.classList.remove("quiz-play-active");
     renderCategoryCards();
 }
 
+// 準備画面を表示
+let selectedCategory = null;
+
+function showQuizReady(category) {
+    selectedCategory = category;
+
+    const selectEl = getById("quiz-select");
+    const readyEl = getById("quiz-ready");
+    const playEl = getById("quiz-play");
+
+    if (selectEl) selectEl.style.display = "none";
+    if (readyEl) readyEl.style.display = "flex";
+    if (playEl) playEl.style.display = "none";
+
+    // カテゴリ情報を設定
+    const titleEl = getById("ready-title");
+    const subtitleEl = getById("ready-subtitle");
+    const countEl = getById("ready-count");
+    const iconEl = getById("ready-category-icon");
+
+    const displayName = category === "全て" ? "全カテゴリ" : category;
+    const subtitle = category === "全て" ? "すべてのカテゴリから出題" : getCategoryDisplayName(category);
+
+    if (titleEl) titleEl.textContent = displayName;
+    if (subtitleEl) subtitleEl.textContent = subtitle !== displayName ? subtitle : "";
+
+    // 問題数を取得
+    const { allEvents } = getState();
+    const count = category === "全て"
+        ? allEvents.length
+        : allEvents.filter(e => e.category === category).length;
+    if (countEl) countEl.textContent = count;
+
+    // アイコン（グラデーション）を設定
+    const gradientMap = {
+        "古代オリエント・地中海世界": "gradient-ancient",
+        "東・南アジア1": "gradient-asia1",
+        "東・南アジア2": "gradient-asia2",
+        "イスラーム世界": "gradient-islam",
+        "中世ヨーロッパ": "gradient-medieval",
+        "近代ヨーロッパ": "gradient-early-modern",
+        "現代世界史1": "gradient-modern1",
+        "現代世界史2": "gradient-modern2",
+        "現代世界史3": "gradient-modern3",
+        "その他": "gradient-other",
+        "全て": "gradient-all"
+    };
+
+    if (iconEl) {
+        iconEl.className = `ready-category-icon ${gradientMap[category] || "gradient-other"}`;
+        // アニメーションをリセット
+        iconEl.style.animation = "none";
+        iconEl.offsetHeight; // リフロー
+        iconEl.style.animation = "";
+    }
+}
+
 function showQuizPlay(categoryName) {
     const selectEl = getById("quiz-select");
+    const readyEl = getById("quiz-ready");
     const playEl = getById("quiz-play");
     const titleEl = getById("quiz-play-title");
     if (selectEl) selectEl.style.display = "none";
+    if (readyEl) readyEl.style.display = "none";
     if (playEl) playEl.style.display = "block";
     document.body.classList.add("quiz-play-active");
     if (titleEl) {

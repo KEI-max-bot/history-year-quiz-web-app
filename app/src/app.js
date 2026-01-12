@@ -83,11 +83,21 @@ function bindUI() {
 
     // クイズ関連ボタン
     const startQuizBtn = getById("start-quiz-btn");
+    const readyBackBtn = getById("ready-back-btn");
     const checkAnswerBtn = getById("check-answer-btn");
     const endQuizBtn = getById("end-quiz-btn");
     const restartQuizBtn = getById("restart-quiz-btn");
 
-    if (startQuizBtn) startQuizBtn.addEventListener("click", startQuiz);
+    if (startQuizBtn) {
+        startQuizBtn.addEventListener("click", () => {
+            if (selectedCategory) {
+                startQuizFromCategory(selectedCategory);
+            }
+        });
+    }
+    if (readyBackBtn) {
+        readyBackBtn.addEventListener("click", showQuizSelect);
+    }
     if (checkAnswerBtn) checkAnswerBtn.addEventListener("click", checkAnswer);
     if (endQuizBtn) {
         endQuizBtn.addEventListener("click", () => {
